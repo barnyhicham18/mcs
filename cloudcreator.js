@@ -8,48 +8,11 @@ const path = require('path');
 const yaml = require('js-yaml');
 const axios = require('axios');
 const https = require('https');
-const mysql = require('mysql2/promise');
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// Database connection pool
-const dbPool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
-
-// Initialize database table for cloud spaces
-async function initializeDatabase() {
-  try {
-    const connection = await dbPool.getConnection();
-    await connection.execute(`
-      CREATE TABLE IF NOT EXISTS cloud_spaces (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        project_name VARCHAR(255) NOT NULL,
-        description TEXT,
-        vcpus_limit INT NOT NULL,
-        memory_limit_gb INT NOT NULL,
-        storage_limit_bytes BIGINT NOT NULL,
-        price DECIMAL(10, 2) NOT NULL,
-        status VARCHAR(50) DEFAULT 'created',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
-    connection.release();
-    console.log('Database table initialized successfully');
-  } catch (error) {
-    console.error('Error initializing database:', error);
-  }
-}
 
 // Configuration - using environment variables
 const config = {
@@ -146,31 +109,6 @@ function createProject(projectName, description, vcpusLimit, memoryLimitGb, stor
   });
 }
 
-// Store project details in database
-async function storeProjectInDatabase(projectData) {
-  try {
-    const connection = await dbPool.getConnection();
-    const [result] = await connection.execute(
-      `INSERT INTO cloud_spaces (project_name, description, vcpus_limit, memory_limit_gb, storage_limit_bytes, price)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        projectData.projectName,
-        projectData.description,
-        projectData.vcpusLimit,
-        projectData.memoryLimitGb,
-        projectData.storageLimitBytes,
-        projectData.price
-      ]
-    );
-    connection.release();
-    console.log('Project details stored in database with ID:', result.insertId);
-    return result.insertId;
-  } catch (error) {
-    console.error('Error storing project in database:', error);
-    throw error;
-  }
-}
-
 // API endpoint to create project
 app.post('/api/project/create', async (req, res) => {
   try {
@@ -210,19 +148,6 @@ app.post('/api/project/create', async (req, res) => {
     );
 
     if (result.success) {
-      // Prepare project data for database
-      const projectData = {
-        projectName,
-        description,
-        vcpusLimit: planConfig.vcpus,
-        memoryLimitGb: planConfig.memory_gb,
-        storageLimitBytes: storageBytes,
-        price
-      };
-
-      // Store project details in database
-      await storeProjectInDatabase(projectData);
-
       res.json({ success: true, message: 'Project created successfully' });
     } else {
       res.status(500).json({
@@ -248,22 +173,6 @@ app.get('/api/options', (req, res) => {
   });
 });
 
-// API endpoint to get all projects from database
-app.get('/api/projects', async (req, res) => {
-  try {
-    const connection = await dbPool.getConnection();
-    const [rows] = await connection.execute('SELECT * FROM cloud_spaces ORDER BY created_at DESC');
-    connection.release();
-    res.json({ success: true, projects: rows });
-  } catch (error) {
-    console.error('Error fetching projects from database:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch projects from database'
-    });
-  }
-});
-
 // Serve the HTML interface
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -274,30 +183,16 @@ app.get('/payment', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'payment.html'));
 });
 
-// Initialize the server and database
-async function initializeServer() {
-  try {
-    // Initialize database table
-    await initializeDatabase();
-
-    // Start the server
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Cloud Space Provider app listening on port ${PORT}`);
-      console.log('Available plans:');
-      Object.keys(cloudSpacePlans).forEach(plan => {
-        console.log(`- ${plan}: ${cloudSpacePlans[plan].vcpus} vCPUs, ${cloudSpacePlans[plan].memory_gb}GB RAM, ${cloudSpacePlans[plan].price} MAD`);
-      });
-      console.log('Available storage options:');
-      Object.keys(storageOptions).forEach(bytes => {
-        console.log(`- ${bytes} bytes: ${storageOptions[bytes].display}, ${storageOptions[bytes].price} MAD`);
-      });
-    });
-  } catch (error) {
-    console.error('Failed to initialize server:', error);
-    process.exit(1);
-  }
-}
-
-// Start the server initialization
-initializeServer();
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Cloud Space Provider app listening on port ${PORT}`);
+  console.log('Available plans:');
+  Object.keys(cloudSpacePlans).forEach(plan => {
+    console.log(`- ${plan}: ${cloudSpacePlans[plan].vcpus} vCPUs, ${cloudSpacePlans[plan].memory_gb}GB RAM, ${cloudSpacePlans[plan].price} MAD`);
+  });
+  console.log('Available storage options:');
+  Object.keys(storageOptions).forEach(bytes => {
+    console.log(`- ${bytes} bytes: ${storageOptions[bytes].display}, ${storageOptions[bytes].price} MAD`);
+  });
+});
