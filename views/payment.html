@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Nutanix Cloud Space Provider</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .prefilled-data {
+            background-color: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-method {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .coupon-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .coupon-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .coupon-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #0a9396;
+        }
+
+        .btn-disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .btn-disabled:hover {
+            background-color: var(--gray);
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .success {
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .summary {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-methods {
+                flex-direction: column;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+
+        .order-details {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-details h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Deployment result styles */
+        .deployment-result {
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .deployment-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            border: 1px solid var(--success);
+            color: #0a58ca;
+        }
+
+        .deployment-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .deployment-item {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-left: 3px solid transparent;
+        }
+
+        .deployment-item-success {
+            border-left-color: green;
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+
+        .deployment-item-error {
+            border-left-color: red;
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            padding: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .payment-processing {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+        }
+
+        .payment-success {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: rgba(76, 201, 240, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--success);
+            color: #0a58ca;
+        }
+
+        .payment-completed-display {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+            opacity: 0.8;
+            cursor: default;
+        }
+        
+        .cloud-space-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .resource-details {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .resource-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .resource-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Cloud Space Configuration</a>
+
+        <header>
+            <h1>Nutanix Cloud Space Provider</h1>
+            <p>Complete your purchase</p>
+        </header>
+
+        <div class="two-column-layout">
+            <div>
+                <div class="card">
+                    <div class="order-details">
+                        <h3>Your Order</h3>
+                        <div id="order-items">
+                            <!-- Order items will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <h2>Payment Method</h2>
+                    <div class="payment-methods">
+                        <div class="payment-method selected">
+                            <div class="cloud-space-icon">💳</div>
+                            <div>Credit Card</div>
+                        </div>
+                        <div class="payment-method">
+                            <div class="cloud-space-icon">📱</div>
+                            <div>PayPal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Personal Information</h2>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <div class="prefilled-data">John Doe</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <div class="prefilled-data">john.doe@example.com</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Billing Address</label>
+                        <div class="prefilled-data">123 Cloud Street, Casablanca, Morocco</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Credit Card Information</h2>
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <div class="prefilled-data">**** **** **** 1234</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Expiration Date</label>
+                        <div class="prefilled-data">12/2025</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Security Code (CVV)</label>
+                        <div class="prefilled-data">***</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>Order Summary</h2>
+                    <div class="summary-item">
+                        <span>Subtotal:</span>
+                        <span id="subtotal-amount">0.00 MAD</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Discount:</span>
+                        <span id="discount-amount">0.00 MAD</span>
+                    </div>
+                    <div class="summary-item summary-total">
+                        <span>Total Due:</span>
+                        <span id="total-amount">0.00 MAD</span>
+                    </div>
+                </div>
+
+                <div class="coupon-section">
+                    <h3>Apply Coupon Code</h3>
+                    <div class="coupon-input">
+                        <input type="text" id="coupon-code" placeholder="Enter coupon code">
+                        <button class="btn" id="apply-coupon">Apply</button>
+                    </div>
+                    <div class="error" id="coupon-error">Invalid coupon code</div>
+                    <div class="success" id="coupon-success">Coupon applied successfully!</div>
+                </div>
+
+                <div class="summary">
+                    <button class="btn btn-disabled btn-block" id="complete-payment-btn" disabled>Complete Payment</button>
+                    <div id="payment-completed-display" class="payment-completed-display" style="display: none;">Payment Completed</div>
+                    <button class="btn btn-disabled btn-block" id="create-project-btn" disabled style="display: none; margin-top: 0.5rem;">Create Cloud Space</button>
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--gray);">
+                        Apply a coupon code to complete payment
+                    </p>
+                </div>
+
+                <!-- Payment processing indicator -->
+                <div class="payment-processing" id="payment-processing">
+                    <div class="spinner"></div>
+                    <p>Processing your payment...</p>
+                </div>
+
+                <!-- Payment success message -->
+                <div class="payment-success" id="payment-success">
+                    <p>✅ Payment processed successfully!</p>
+                    <p>You can now create your cloud space</p>
+                </div>
+
+                <!-- Deployment result container -->
+                <div class="deployment-result" id="deployment-result"></div>
+
+                <!-- Loading indicator -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Creating your cloud space...</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by Nutanix & Node.js | © 2023 Cloud Space Provider</p>
+            <p>This is a mock payment page for demonstration purposes only. No actual payments are processed.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const couponCodeInput = document.getElementById('coupon-code');
+            const applyCouponBtn = document.getElementById('apply-coupon');
+            const couponError = document.getElementById('coupon-error');
+            const couponSuccess = document.getElementById('coupon-success');
+            const discountAmount = document.getElementById('discount-amount');
+            const totalAmount = document.getElementById('total-amount');
+            const subtotalAmount = document.getElementById('subtotal-amount');
+            const completePaymentBtn = document.getElementById('complete-payment-btn');
+            const paymentCompletedDisplay = document.getElementById('payment-completed-display');
+            const createProjectBtn = document.getElementById('create-project-btn');
+            const orderItemsContainer = document.getElementById('order-items');
+            const deploymentResult = document.getElementById('deployment-result');
+            const loadingIndicator = document.getElementById('loading');
+            const paymentProcessing = document.getElementById('payment-processing');
+            const paymentSuccess = document.getElementById('payment-success');
+
+            // Valid coupon code
+            const validCoupon = 'FREENTNX2026';
+
+            // Get cart data from session storage
+            let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+            let total = 0;
+            let paymentCompleted = false;
+
+            // Calculate total and display order items
+            if (cart.length > 0) {
+                cart.forEach(item => {
+                    total += item.price;
+
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    orderItem.innerHTML = `
+                        <div>
+                            <div><strong>${item.projectName}</strong></div>
+                            <div>${item.size.toUpperCase()} Cloud Space</div>
+                        </div>
+                        <div>${item.price.toFixed(2)} MAD</div>
+                    `;
+                    orderItemsContainer.appendChild(orderItem);
+                    
+                    // Add resource details
+                    const resourceDetails = document.createElement('div');
+                    resourceDetails.className = 'resource-details';
+                    resourceDetails.innerHTML = `
+                        <div class="resource-item">
+                            <span>vCPUs:</span>
+                            <span>${item.vcpus}</span>
+                        </div>
+                        <div class="resource-item">
+                            <span>RAM:</span>
+                            <span>${item.ram} GB</span>
+                        </div>
+                        <div class="resource-item">
+                            <span>Storage:</span>
+                            <span>${item.storageDisplay}</span>
+                        </div>
+                    `;
+                    orderItemsContainer.appendChild(resourceDetails);
+                });
+
+                subtotalAmount.textContent = `${total.toFixed(2)} MAD`;
+                totalAmount.textContent = `${total.toFixed(2)} MAD`;
+            } else {
+                // If no cart data, redirect back to main page
+                window.location.href = '/';
+            }
+
+            // Apply coupon code
+            applyCouponBtn.addEventListener('click', function() {
+                const enteredCode = couponCodeInput.value.trim();
+
+                if (enteredCode === validCoupon) {
+                    // Valid coupon code
+                    couponError.style.display = 'none';
+                    couponSuccess.style.display = 'block';
+
+                    // Apply discount (set total to 0.00 MAD)
+                    discountAmount.textContent = `-${total.toFixed(2)} MAD`;
+                    totalAmount.textContent = '0.00 MAD';
+                    totalAmount.style.color = 'green';
+
+                    // Enable the Complete Payment button
+                    completePaymentBtn.disabled = false;
+                    completePaymentBtn.classList.remove('btn-disabled');
+
+                    // Update instruction text
+                    document.querySelector('.summary p').textContent = 'Complete payment to proceed with cloud space creation';
+
+                } else if (enteredCode === '') {
+                    // Empty coupon code
+                    couponSuccess.style.display = 'none';
+                    couponError.textContent = 'Please enter a coupon code';
+                    couponError.style.display = 'block';
+                } else {
+                    // Invalid coupon code
+                    couponSuccess.style.display = 'none';
+                    couponError.textContent = 'Invalid coupon code';
+                    couponError.style.display = 'block';
+
+                    // Reset amounts
+                    discountAmount.textContent = '0.00 MAD';
+                    totalAmount.textContent = `${total.toFixed(2)} MAD`;
+                    totalAmount.style.color = '';
+
+                    // Keep the button disabled
+                    completePaymentBtn.disabled = true;
+                    completePaymentBtn.classList.add('btn-disabled');
+
+                    // Update instruction text
+                    document.querySelector('.summary p').textContent = 'Apply a coupon code to complete payment';
+                }
+            });
+
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Complete Payment functionality
+            completePaymentBtn.addEventListener('click', async function() {
+                if (!this.disabled && !paymentCompleted) {
+                    // Show payment processing
+                    paymentProcessing.style.display = 'block';
+                    this.disabled = true;
+                    this.textContent = 'Processing...';
+
+                    // Simulate payment processing delay
+                    setTimeout(() => {
+                        // Hide processing indicator
+                        paymentProcessing.style.display = 'none';
+
+                        // Show success message
+                        paymentSuccess.style.display = 'block';
+
+                        // Enable project creation button
+                        createProjectBtn.style.display = 'block';
+                        createProjectBtn.disabled = false;
+                        createProjectBtn.classList.remove('btn-disabled');
+                        createProjectBtn.classList.add('btn-success');
+
+                        // Update payment status
+                        paymentCompleted = true;
+
+                        // Replace the button with a non-interactive display element
+                        completePaymentBtn.style.display = 'none';
+                        paymentCompletedDisplay.style.display = 'block';
+
+                        // Update instruction text
+                        document.querySelector('.summary p').textContent = 'You can now create your cloud space';
+                    }, 2000);
+                }
+            });
+
+            // Create Project functionality
+            createProjectBtn.addEventListener('click', async function() {
+                if (!this.disabled) {
+                    // Disable the button immediately to prevent multiple clicks
+                    this.disabled = true;
+                    this.classList.add('btn-disabled');
+                    this.classList.remove('btn-success');
+                    this.textContent = 'Processing...';
+
+                    // Show loading indicator
+                    loadingIndicator.style.display = 'block';
+                    deploymentResult.style.display = 'none';
+
+                    try {
+                        // Create each cloud space in the cart
+                        const results = [];
+
+                        for (const item of cart) {
+                            try {
+                                const response = await fetch('/api/project/create', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        projectName: item.projectName,
+                                        description: item.description,
+                                        size: item.size,
+                                        storageBytes: item.storage
+                                    })
+                                });
+
+                                const result = await response.json();
+
+                                results.push({
+                                    success: result.success,
+                                    message: result.success ? 'Cloud space created successfully!' : result.error
+                                });
+                            } catch (error) {
+                                results.push({
+                                    success: false,
+                                    error: error.message || 'Failed to create cloud space'
+                                });
+                            }
+                        }
+
+                        // Show deployment results
+                        deploymentResult.style.display = 'block';
+
+                        let successCount = results.filter(r => r.success).length;
+                        let errorCount = results.filter(r => !r.success).length;
+
+                        if (successCount > 0 && errorCount === 0) {
+                            deploymentResult.className = 'deployment-result deployment-success';
+                        } else if (errorCount > 0 && successCount === 0) {
+                            deploymentResult.className = 'deployment-result deployment-error';
+                        } else {
+                            // Mixed results
+                            deploymentResult.style.borderLeft = '4px solid #ffc107';
+                            deploymentResult.style.backgroundColor = '#fff3cd';
+                            deploymentResult.style.color = '#856404';
+                        }
+
+                        deploymentResult.innerHTML = `
+                            <h3>Creation Complete</h3>
+                            <p><strong>${successCount}</strong> cloud spaces created successfully, <strong>${errorCount}</strong> failed</p>
+                            <div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;">
+                                ${results.map((result, index) => `
+                                    <div class="deployment-item ${result.success ? 'deployment-item-success' : 'deployment-item-error'}">
+                                        <strong>Cloud Space ${index + 1}:</strong> ${result.success ? result.message : result.error}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+
+                        // Clear cart after successful creation
+                        if (successCount > 0) {
+                            cart = cart.filter((_, index) => !results[index].success);
+                            sessionStorage.setItem('cart', JSON.stringify(cart));
+                        }
+
+                        // Update button text to indicate completion
+                        createProjectBtn.textContent = 'Cloud Space Creation Completed';
+
+                    } catch (error) {
+                        deploymentResult.style.display = 'block';
+                        deploymentResult.className = 'deployment-result deployment-error';
+                        deploymentResult.innerHTML = `
+                            <h3>Creation Error</h3>
+                            <p>${error.message || 'Unknown error occurred during creation'}</p>
+                        `;
+
+                        // Reset button if there was an error
+                        createProjectBtn.disabled = false;
+                        createProjectBtn.classList.remove('btn-disabled');
+                        createProjectBtn.classList.add('btn-success');
+                        createProjectBtn.textContent = 'Create Cloud Space';
+                    } finally {
+                        loadingIndicator.style.display = 'none';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

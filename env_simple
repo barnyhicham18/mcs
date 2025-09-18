@@ -1,0 +1,19 @@
+# Database Configuration
+DB_HOST=localhost
+DB_USER=user_db
+DB_PASSWORD=********
+DB_NAME=fb_name
+
+# Nutanix Configuration
+PC_ENDPOINT=10.65.21.11
+NUTANIX_USER=admin
+NUTANIX_PASSWORD=password123
+PE_CLUSTER_NAME=cluster
+SUBNET=subnet00
+
+# Session Secret
+SESSION_SECRET=secret123
+
+# Server Port
+PORT=3000
+
