@@ -1,12 +1,7 @@
 {
-  "name": "nutanix-vm-manager",
+  "name": " Morocco Cloud Space",
   "version": "1.0.0",
-  "description": "Node.js app to manage Nutanix VMs via Ansible",
-  "main": "vm-manager.js",
-  "scripts": {
-    "start": "node vm-manager.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "cloudcreator.js",
   "dependencies": {
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
@@ -22,7 +17,6 @@
   "keywords": [
     "nutanix",
     "ansible",
-    "vm",
     "automation"
   ]
 }
