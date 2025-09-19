@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
@@ -33,9 +33,9 @@ const cloudSpacePlans = {
 
 // Storage options with prices
 const storageOptions = {
-  "1000000000000": { display: "1 TB", price: 100 },
-  "2000000000000": { display: "2 TB", price: 190 },
-  "3000000000000": { display: "3 TB", price: 250 }
+  "500000000000": { display: "500 GB", price: 0 },
+  "1000000000000": { display: "1 TB", price: 0 },
+  "2000000000000": { display: "2 TB", price: 0 }
 };
 
 // Function to calculate price
@@ -45,11 +45,31 @@ function calculatePrice(plan, storageBytes) {
   return planPrice + storagePrice;
 }
 
-// Function to create project using Ansible
-function createProject(projectName, description, vcpusLimit, memoryLimitGb, storageLimitBytes) {
+// Function to generate random user data
+function generateUserData() {
+  try {
+    // Run the generate-user.js script
+    execSync('node generate-user.js', { cwd: __dirname, stdio: 'pipe' });
+
+    // Read the generated user data
+    const userDataPath = path.join(__dirname, 'user_data.json');
+    if (fs.existsSync(userDataPath)) {
+      const userData = JSON.parse(fs.readFileSync(userDataPath, 'utf8'));
+      return userData;
+    } else {
+      throw new Error('User data file not found after generation');
+    }
+  } catch (error) {
+    console.error('Error generating user data:', error);
+    throw error;
+  }
+}
+
+// Function to create project using new Ansible playbook
+function createProjectWithUser(vcpusLimit, memoryLimitGb, storageLimitBytes, userData) {
   return new Promise((resolve, reject) => {
-    // Create temporary files
-    const tempVarsFile = path.join(__dirname, 'temp_project_vars.yaml');
+    // Use the username as the project name
+    const projectName = userData.name;
 
     // Prepare variables for Ansible
     const ansibleVars = {
@@ -57,23 +77,20 @@ function createProject(projectName, description, vcpusLimit, memoryLimitGb, stor
       nutanix_username: config.nutanixUser,
       nutanix_password: config.nutanixPassword,
       project_name: projectName,
-      project_description: description,
-      vcpus_limit: vcpusLimit,
-      memory_limit: memoryLimitGb * 1000000000, // Convert GB to bytes
-      storage_limit: storageLimitBytes,
+      project_description: "Cloud space project",
+      vcpus_limit: parseInt(vcpusLimit),
+      memory_limit: parseInt(memoryLimitGb),
+      storage_limit: parseInt(storageLimitBytes),
       subnet_name: config.subnetName,
       account_name: config.accountName,
       directory_service_uuid: config.directoryServiceUuid
     };
 
-    // Write temporary files
-    fs.writeFileSync(tempVarsFile, yaml.dump(ansibleVars));
-
     // Execute Ansible playbook
     const ansibleProcess = spawn('ansible-playbook', [
-      'project_create.yaml',
-      '--extra-vars',
-      `@${tempVarsFile}`
+      'create_ad_user_ntnx_project.yaml',
+      '-i', 'inventory.ini',
+      '--extra-vars', JSON.stringify(ansibleVars)
     ], {
       cwd: __dirname,
       stdio: 'pipe'
@@ -88,20 +105,31 @@ function createProject(projectName, description, vcpusLimit, memoryLimitGb, stor
     });
 
     ansibleProcess.stderr.on('data', (data) => {
-      errorOutput += data.toString();
+      errorOutput = data.toString();
       console.error(data.toString());
     });
 
     ansibleProcess.on('close', (code) => {
-      // Remove temporary files
-      try {
-        fs.unlinkSync(tempVarsFile);
-      } catch (err) {
-        console.error('Error cleaning up temporary files:', err);
-      }
-
       if (code === 0) {
-        resolve({ success: true, output });
+        // Extract project information from output
+        const projectInfo = extractProjectInfo(output);
+
+        resolve({
+          success: true,
+          output,
+          userData: {
+            username: userData.name,
+            password: userData.password,
+            upn: userData.upn
+          },
+          projectUrl: projectInfo.url || "console.demonutanix.africa",
+          configuration: {
+            vcpus: vcpusLimit,
+            memory: memoryLimitGb,
+            storage: storageLimitBytes,
+            storageDisplay: storageOptions[storageLimitBytes]?.display || `${storageLimitBytes / 1000000000000} TB`
+          }
+        });
       } else {
         reject({ success: false, output, error: errorOutput });
       }
@@ -109,15 +137,28 @@ function createProject(projectName, description, vcpusLimit, memoryLimitGb, stor
   });
 }
 
+// Helper function to extract project information from Ansible output
+function extractProjectInfo(output) {
+  // This is a simplified implementation - adjust based on your actual Ansible output
+  const info = {
+    url: "console.demonutanix.africa" // Default URL
+  };
+
+  // Add logic here to parse specific information from the Ansible output
+  // For example, if your playbook outputs a specific format, you can regex it
+
+  return info;
+}
+
 // API endpoint to create project
 app.post('/api/project/create', async (req, res) => {
   try {
-    const { projectName, description, size, storageBytes } = req.body;
+    const {size, storageBytes } = req.body;
 
-    if (!projectName || !size || !storageBytes) {
+    if (!size || !storageBytes) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required parameters: projectName, size, and storageBytes are required'
+        error: 'Missing required parameters: size and storageBytes are required'
       });
     }
 
@@ -138,17 +179,35 @@ app.post('/api/project/create', async (req, res) => {
     const planConfig = cloudSpacePlans[size];
     const price = calculatePrice(size, storageBytes);
 
-    // Create the project
-    const result = await createProject(
-      projectName,
-      description,
+    // Generate user data
+    let userData;
+    try {
+      userData = await generateUserData();
+      console.log('Generated user data:', userData);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to generate user data',
+        details: error.message
+      });
+    }
+
+    // Create the project with the new user
+    const result = await createProjectWithUser(
       planConfig.vcpus,
       planConfig.memory_gb,
-      storageBytes
+      storageBytes,
+      userData
     );
 
     if (result.success) {
-      res.json({ success: true, message: 'Project created successfully' });
+      res.json({
+        success: true,
+        message: 'Project created successfully',
+        userData: result.userData,
+        projectUrl: result.projectUrl,
+        configuration: result.configuration
+      });
     } else {
       res.status(500).json({
         success: false,
@@ -186,13 +245,9 @@ app.get('/payment', (req, res) => {
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Cloud Space Provider app listening on port ${PORT}`);
+  console.log(`Morocco Cloud Space app listening on port ${PORT}`);
   console.log('Available plans:');
   Object.keys(cloudSpacePlans).forEach(plan => {
     console.log(`- ${plan}: ${cloudSpacePlans[plan].vcpus} vCPUs, ${cloudSpacePlans[plan].memory_gb}GB RAM, ${cloudSpacePlans[plan].price} MAD`);
-  });
-  console.log('Available storage options:');
-  Object.keys(storageOptions).forEach(bytes => {
-    console.log(`- ${bytes} bytes: ${storageOptions[bytes].display}, ${storageOptions[bytes].price} MAD`);
   });
 });

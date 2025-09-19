@@ -1,0 +1,9 @@
+[windows_dc]
+10.383.1.7  # Your AD server IP
+
+[windows_dc:vars]
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
+ansible_user=administrator
+ansible_password=administrator-password

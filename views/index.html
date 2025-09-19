@@ -3,184 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutanix Cloud Space Provider</title>
+    <title>Morocco Cloud Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
+            --bg-light: #F8F9FA;
+            --bg-card: #FFFFFF;
+            --border-color: #DEE2E6;
+            --primary-accent: #6C5CE7;
+            --text-primary: #212529;
+            --text-secondary: #6C757D;
+            --gradient-start: #6C5CE7;
+            --gradient-end: #8A2BE2;
             --success: #4cc9f0;
-            --warning: #f72585;
             --danger: #dc3545;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fb;
-            color: var(--dark);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
             line-height: 1.6;
-            margin: 0;
-            padding: 0;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
             padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
 
         h1, h2, h3 {
-            margin-top: 0;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
             font-weight: 600;
         }
 
-        select, input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: inline-block;
+        /* Header */
+        .hero {
             text-align: center;
-            text-decoration: none;
+            padding: 5rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            color: #FFFFFF;
+            background-image:
+                linear-gradient(to right, rgba(108, 92, 231, 0.9), rgba(138, 43, 226, 0.9)),
+                url('https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover;
+            background-position: center;
         }
 
-        .btn:hover {
-            background-color: var(--secondary);
-        }
+        .hero h1 { font-size: 2.5rem; color: #FFFFFF; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .hero p { font-size: 1rem; color: #FFFFFF; opacity: 0.9; }
+        .hero .demo-credit { margin-top: 1rem; font-size: 0.8rem; opacity: 0.7; }
 
-        .btn-success {
-            background-color: var(--success);
-        }
+        /* General Styles */
+        .section-title { font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--text-primary); }
+        .main-content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start; }
 
-        .btn-success:hover {
-            background-color: #0a9396;
+        /* Plan Cards */
+        .plans-container { display: flex; flex-direction: column; gap: 1.5rem; }
+        .plan-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            position: relative;
         }
-
-        .btn-danger {
-            background-color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background-color: #bd2130;
-        }
-
-        .btn-block {
-            display: block;
+        .plan-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
+        .plan-card.selected { border: 2px solid var(--primary-accent); box-shadow: 0 0 15px rgba(108, 92, 231, 0.2); }
+        .plan-card-content { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: center; }
+        .plan-card h3 { font-size: 1.25rem; color: var(--text-primary); margin-bottom: 0.25rem; }
+        .plan-price { font-size: 1.6rem; font-weight: 700; color: var(--primary-accent); margin: 0.25rem 0 1rem 0; display: block; }
+        .plan-price span { font-size: 0.85rem; font-weight: 400; color: var(--text-secondary); }
+        .plan-details { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem; color: var(--text-secondary); }
+        .plan-details strong { color: var(--text-primary); font-weight: 500; }
+        .plan-features-list { list-style: none; color: var(--text-secondary); font-size: 0.9rem; }
+        .plan-features-list li { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .plan-features-list li svg { flex-shrink: 0; width: 18px; height: 18px; color: var(--primary-accent); }
+        .btn {
             width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1.5rem;
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(108, 92, 231, 0.2); }
+        .btn-success { background-image: linear-gradient(to right, var(--success), #0a9396); }
+        .btn-danger { background-image: linear-gradient(to right, var(--danger), #bd2130); }
+        .btn:disabled {
+            background-image: linear-gradient(to right, #cccccc, #999999);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
         }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+        /* Right Column Cards (Summary & Cart) */
+        .order-summary, .shopping-cart {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .order-summary {
             margin-bottom: 2rem;
         }
 
-        .option-card {
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
+        .shopping-cart {
+            position: sticky;
+            top: 2rem;
         }
 
-        .option-card.selected {
-            border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .option-card h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .option-card .price {
+        .order-summary h2, .shopping-cart h2 {
             font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--secondary);
-            margin: 0.5rem 0;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .option-card .specs {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .summary {
-            background-color: var(--light);
-            padding: 1.5rem;
-            border-radius: 10px;
-        }
-
-        .summary-item {
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: var(--text-secondary); }
+        .summary-line span:last-child { color: var(--text-primary); font-weight: 500; }
+        .summary-total-line {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1.1rem;
         }
+        .summary-total-line .price { font-size: 1.6rem; color: var(--primary-accent); }
 
-        .summary-item:last-child {
-            border-bottom: none;
+        .cart-empty-message { text-align: center; color: var(--text-secondary); padding: 2rem 0; font-size: 1rem; }
+        .cart-empty-message p:first-child { margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary); }
+
+        .cart-items { display: none; }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            align-items: center;
         }
-
-        .summary-total {
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: var(--secondary);
+        .cart-item-details { flex: 1; }
+        .cart-item .label { color: var(--text-secondary); }
+        .cart-item .value { font-weight: 500; color: var(--text-primary); }
+        .cart-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
+        .cart-total .price { font-size: 1.8rem; color: var(--primary-accent); }
 
+        /* Result messages */
         .result {
             padding: 1rem;
             border-radius: 5px;
@@ -200,329 +198,306 @@
             color: #721c24;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
-            padding: 1rem;
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content-grid { grid-template-columns: 1fr; }
+            .shopping-cart { position: static; }
+        }
+        @media (max-width: 576px) {
+            .plan-card-content { grid-template-columns: 1fr; }
+            .cart-item { flex-direction: column; align-items: flex-start; }
+            .cart-item-actions { margin-top: 0.5rem; width: 100%; }
+            .cart-item-actions .btn { width: 100%; }
         }
 
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1rem;
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .cart-section {
-            margin-top: 2rem;
+        /* Animation for cart items */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .cart-item-details {
-            flex: 1;
-        }
-
-        .cart-item-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray);
-        }
-
-        .cart-total {
-            text-align: right;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #eee;
-        }
-
-        .two-column-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .two-column-layout {
-                grid-template-columns: 1fr;
-            }
-
-            header {
-                padding: 1.5rem 1rem;
-            }
-        }
-
-        .form-group-required label:after {
-            content: " *";
-            color: var(--danger);
+        /* Badge for selected plan */
+        .selected-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--primary-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Nutanix Cloud Space Provider</h1>
-            <p>Create your own cloud space with resource quotas</p>
-        </header>
 
-        <div class="two-column-layout">
-            <div>
-                <div class="card">
-                    <h2>Choose Your Cloud Space Plan</h2>
-                    <p>Select the right plan for your needs</p>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path fill="currentColor" fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path fill="currentColor" fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+      </symbol>
+    </svg>
 
-                    <div class="options-grid" id="sizeOptions">
-                        <div class="card option-card" data-size="small" data-vcpus="10" data-ram="20" data-price="500">
-                            <h3>Small</h3>
-                            <div class="price">500 MAD/month</div>
-                            <div class="specs">10 vCPUs, 20GB RAM</div>
+    <header class="hero">
+        <h1>Morocco Cloud Space</h1>
+        <p>Create your own powerful and scalable cloud space with resource quotas.</p>
+        <p class="demo-credit">This is a Demo Page Powered by Nutanix</p>
+    </header>
+
+    <main class="container">
+        <div class="main-content-grid">
+            <section id="plan-selection">
+                <h2 class="section-title">Choose Your Cloud Plan</h2>
+                <div class="plans-container">
+
+                    <div class="plan-card"
+                         data-size="small"
+                         data-vcpus="10"
+                         data-ram="20"
+                         data-storage="500000000000"
+                         data-price="500">
+                        <div class="plan-card-content">
+                            <div class="plan-main-details">
+                                <h3>Small</h3>
+                                <span class="plan-price">500 <span>MAD/month</span></span>
+                                <div class="plan-details">
+                                    <span><strong>10</strong> vCPUs</span>
+                                    <span><strong>20GB</strong> RAM</span>
+                                    <span><strong>500GB</strong> Storage</span>
+                                </div>
+                            </div>
+                            <div class="plan-common-features">
+                                <ul class="plan-features-list">
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Virtual Datacenter</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Networks</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Virtual Machines</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Rich Marketplace</li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="card option-card" data-size="medium" data-vcpus="20" data-ram="40" data-price="900">
-                            <h3>Medium</h3>
-                            <div class="price">900 MAD/month</div>
-                            <div class="specs">20 vCPUs, 40GB RAM</div>
+                        <button class="btn add-to-cart-btn">Add to Cart</button>
+                    </div>
+
+                    <div class="plan-card"
+                         data-size="medium"
+                         data-vcpus="20"
+                         data-ram="40"
+                         data-storage="1000000000000"
+                         data-price="900">
+                        <div class="plan-card-content">
+                            <div class="plan-main-details">
+                                <h3>Medium</h3>
+                                <span class="plan-price">900 <span>MAD/month</span></span>
+                                <div class="plan-details">
+                                    <span><strong>20</strong> vCPUs</span>
+                                    <span><strong>40GB</strong> RAM</span>
+                                    <span><strong>1TB</strong> Storage</span>
+                                </div>
+                            </div>
+                            <div class="plan-common-features">
+                                <ul class="plan-features-list">
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Virtual Datacenter</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Networks</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Virtual Machines</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Rich Marketplace</li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="card option-card" data-size="large" data-vcpus="30" data-ram="50" data-price="1500">
-                            <h3>Large</h3>
-                            <div class="price">1500 MAD/month</div>
-                            <div class="specs">30 vCPUs, 50GB RAM</div>
+                        <button class="btn add-to-cart-btn">Add to Cart</button>
+                    </div>
+
+                    <div class="plan-card"
+                         data-size="large"
+                         data-vcpus="30"
+                         data-ram="50"
+                         data-storage="2000000000000"
+                         data-price="1500">
+                        <div class="plan-card-content">
+                             <div class="plan-main-details">
+                                <h3>Large</h3>
+                                <span class="plan-price">1500 <span>MAD/month</span></span>
+                                <div class="plan-details">
+                                    <span><strong>30</strong> vCPUs</span>
+                                    <span><strong>50GB</strong> RAM</span>
+                                    <span><strong>2TB</strong> Storage</span>
+                                </div>
+                            </div>
+                            <div class="plan-common-features">
+                                <ul class="plan-features-list">
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Virtual Datacenter</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Networks</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Unlimited Virtual Machines</li>
+                                    <li><svg><use xlink:href="#icon-check"></use></svg> Rich Marketplace</li>
+                                </ul>
+                            </div>
                         </div>
+                        <button class="btn add-to-cart-btn">Add to Cart</button>
                     </div>
                 </div>
+            </section>
 
-                <div class="card">
-                    <h2>Customize Your Cloud Space</h2>
-
-                    <div class="form-group form-group-required">
-                        <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name" placeholder="Enter a name for your cloud space" required>
-                    </div>
-
-                    <div class="form-group form-group-required">
-                        <label for="storage">Storage Size</label>
-                        <select id="storage" required>
-                            <option value="">Select storage size</option>
-                            <option value="1000000000000" data-price="100">1 TB - 100 MAD</option>
-                            <option value="2000000000000" data-price="190">2 TB - 190 MAD</option>
-                            <option value="3000000000000" data-price="250">3 TB - 250 MAD</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="description">Description (Optional)</label>
-                        <textarea id="description" placeholder="Describe your cloud space" rows="3"></textarea>
-                    </div>
-
-                    <button id="add-to-cart-btn" class="btn btn-block">Add to Cart</button>
-                </div>
-
-                <div class="card summary">
+            <aside>
+                <div class="order-summary">
                     <h2>Order Summary</h2>
-
-                    <div class="summary-item">
+                    <div class="summary-line">
                         <span>Plan:</span>
                         <span id="summary-plan">-</span>
                     </div>
-
-                    <div class="summary-item">
+                    <div class="summary-line">
+                        <span>vCPUs:</span>
+                        <span id="summary-vcpus">-</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>RAM:</span>
+                        <span id="summary-ram">-</span>
+                    </div>
+                    <div class="summary-line">
                         <span>Storage:</span>
                         <span id="summary-storage">-</span>
                     </div>
-
-                    <div class="summary-item summary-total">
+                    <div class="summary-total-line">
                         <span>Monthly Price:</span>
-                        <span id="summary-price">-</span>
+                        <span class="price" id="summary-price">-</span>
                     </div>
                 </div>
-            </div>
 
-            <div class="cart-section">
-                <div class="card">
+                <div class="shopping-cart">
                     <h2>Shopping Cart</h2>
-                    <div id="cart-items">
-                        <div class="empty-cart">
-                            <p>Your cart is empty</p>
-                            <p>Add cloud spaces from the configuration panel</p>
+                    <div id="cart-empty" class="cart-empty-message">
+                        <p>Your cart is empty</p>
+                        <p>Select a plan to get started</p>
+                    </div>
+                    <div id="cart-filled" class="cart-items">
+                        <div class="cart-items-list" id="cart-items-list">
+                            <!-- Cart items will be added here -->
                         </div>
+                        <div class="cart-total">
+                            <span>Total Monthly Price:</span>
+                            <span class="price" id="cart-total-price">0.00 MAD</span>
+                        </div>
+                        <button id="proceed-payment-btn" class="btn btn-success" style="display: none; margin-top: 1rem; width: 100%;">Proceed to Payment</button>
+                        <button id="clear-cart-btn" class="btn btn-danger" style="display: none; margin-top: 0.5rem; width: 100%;">Clear Cart</button>
                     </div>
-                    <div class="cart-total" id="cart-total" style="display: none;">
-                        Total: <span id="cart-total-amount">0.00 </span> MAD/month
-                    </div>
-                    <button id="proceed-payment-btn" class="btn btn-success btn-block" style="display: none; margin-top: 1rem;">Proceed to Payment</button>
-                    <button id="clear-cart-btn" class="btn btn-danger btn-block" style="display: none; margin-top: 0.5rem;">Clear Cart</button>
                 </div>
-            </div>
-        </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Processing your request...</p>
+            </aside>
         </div>
 
         <div class="result" id="result"></div>
-    </div>
-
-    <footer>
-        <p>Powered by Nutanix & Node.js | © 2023 Cloud Space Provider</p>
-    </footer>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Shopping cart array
+            // Shopping cart array (only one item allowed)
             let cart = [];
             let selectedPlan = null;
 
-            // Handle plan selection
-            const planCards = document.querySelectorAll('.option-card');
+            // Get all interactive elements
+            const planCards = document.querySelectorAll('.plan-card');
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
 
-            planCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    planCards.forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
+            // Get Order Summary elements
+            const summaryPlan = document.getElementById('summary-plan');
+            const summaryVcpus = document.getElementById('summary-vcpus');
+            const summaryRam = document.getElementById('summary-ram');
+            const summaryStorage = document.getElementById('summary-storage');
+            const summaryPrice = document.getElementById('summary-price');
+
+            // Get Shopping Cart elements
+            const cartEmpty = document.getElementById('cart-empty');
+            const cartFilled = document.getElementById('cart-filled');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartTotalPrice = document.getElementById('cart-total-price');
+            const proceedPaymentBtn = document.getElementById('proceed-payment-btn');
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            const resultDiv = document.getElementById('result');
+
+            // Add to cart functionality
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const planCard = this.closest('.plan-card');
+
+                    // Remove selection from all cards
+                    planCards.forEach(c => {
+                        c.classList.remove('selected');
+                        const badge = c.querySelector('.selected-badge');
+                        if (badge) badge.remove();
+                    });
+
+                    // Add selection to the clicked card
+                    planCard.classList.add('selected');
+
+                    // Add selected badge
+                    const badge = document.createElement('div');
+                    badge.className = 'selected-badge';
+                    badge.textContent = 'Selected';
+                    planCard.appendChild(badge);
+
+                    // Set the selected plan
                     selectedPlan = {
-                        size: card.dataset.size,
-                        vcpus: card.dataset.vcpus,
-                        ram: card.dataset.ram,
-                        price: parseInt(card.dataset.price)
+                        size: planCard.dataset.size,
+                        vcpus: planCard.dataset.vcpus,
+                        ram: planCard.dataset.ram,
+                        storage: planCard.dataset.storage,
+                        price: parseInt(planCard.dataset.price)
                     };
+
+                    // Update the order summary
                     updateSummary();
+
+                    // Replace the cart with the selected plan (only one plan allowed)
+                    cart = [{
+                        size: selectedPlan.size,
+                        vcpus: selectedPlan.vcpus,
+                        ram: selectedPlan.ram,
+                        storage: selectedPlan.storage,
+                        storageDisplay: formatStorage(selectedPlan.storage),
+                        price: selectedPlan.price
+                    }];
+
+                    // Update cart display
+                    updateCart();
+
+                    // Show success message
+                    showResult('Cloud space added to cart successfully!', 'success');
                 });
             });
 
-            // Update summary when options change
-            document.getElementById('storage').addEventListener('change', updateSummary);
-            document.getElementById('project-name').addEventListener('input', updateSummary);
-
-            // Calculate prices based on selections
-            function calculatePrice() {
-                if (!selectedPlan) return 0;
-
-                const storageSelect = document.getElementById('storage');
-                const storageOption = storageSelect.options[storageSelect.selectedIndex];
-                const storageCost = storageOption ? parseInt(storageOption.dataset.price || 0) : 0;
-
-                return selectedPlan.price + storageCost;
+            // Function to format storage for display
+            function formatStorage(storageBytes) {
+                const storageGB = parseInt(storageBytes) / 1000000000;
+                return storageGB >= 1000 ? `${storageGB / 1000} TB` : `${storageGB} GB`;
             }
 
             // Update the order summary
             function updateSummary() {
-                const planElement = document.getElementById('summary-plan');
-                const storageElement = document.getElementById('summary-storage');
-                const priceElement = document.getElementById('summary-price');
-
-                const storageSelect = document.getElementById('storage');
-                const storageOption = storageSelect.options[storageSelect.selectedIndex];
-                const projectName = document.getElementById('project-name').value;
-
                 if (selectedPlan) {
-                    planElement.textContent = `${selectedPlan.size.toUpperCase()} (${selectedPlan.vcpus} vCPU, ${selectedPlan.ram}GB RAM)`;
+                    summaryPlan.textContent = `${selectedPlan.size.toUpperCase()}`;
+                    summaryVcpus.textContent = `${selectedPlan.vcpus}`;
+                    summaryRam.textContent = `${selectedPlan.ram} GB`;
+                    summaryStorage.textContent = formatStorage(selectedPlan.storage);
+                    summaryPrice.textContent = `${selectedPlan.price.toFixed(2)} MAD/month`;
                 } else {
-                    planElement.textContent = '-';
+                    summaryPlan.textContent = '-';
+                    summaryVcpus.textContent = '-';
+                    summaryRam.textContent = '-';
+                    summaryStorage.textContent = '-';
+                    summaryPrice.textContent = '-';
                 }
-
-                if (storageOption && storageOption.value) {
-                    storageElement.textContent = `${storageOption.text}`;
-                } else {
-                    storageElement.textContent = '-';
-                }
-
-                const price = calculatePrice();
-                priceElement.textContent = `${price.toFixed(2)} MAD/month`;
             }
-
-            // Add to cart functionality
-            document.getElementById('add-to-cart-btn').addEventListener('click', function() {
-                if (!selectedPlan) {
-                    alert('Please select a plan');
-                    return;
-                }
-
-                const projectName = document.getElementById('project-name').value;
-                if (!projectName) {
-                    alert('Please enter a project name');
-                    return;
-                }
-
-                const storageSelect = document.getElementById('storage');
-                if (!storageSelect.value) {
-                    alert('Please select storage size');
-                    return;
-                }
-
-                const storageOption = storageSelect.options[storageSelect.selectedIndex];
-                const description = document.getElementById('description').value;
-                const price = calculatePrice();
-
-                // Add item to cart
-                cart.push({
-                    projectName: projectName,
-                    size: selectedPlan.size,
-                    vcpus: selectedPlan.vcpus,
-                    ram: selectedPlan.ram,
-                    storage: storageSelect.value,
-                    storageDisplay: storageOption.text,
-                    description: description,
-                    price: price
-                });
-
-                // Update cart display
-                updateCart();
-
-                // Show success message
-                showResult('Cloud space added to cart successfully!', 'success');
-
-                // Reset form
-                document.getElementById('project-name').value = '';
-                document.getElementById('storage').selectedIndex = 0;
-                document.getElementById('description').value = '';
-                planCards.forEach(c => c.classList.remove('selected'));
-                selectedPlan = null;
-                updateSummary();
-
-                // Log to console for debugging
-                console.log('Added to cart:', cart[cart.length - 1]);
-            });
 
             // Update cart display
             function updateCart() {
-                const cartItems = document.getElementById('cart-items');
-                const cartTotal = document.getElementById('cart-total');
-                const cartTotalAmount = document.getElementById('cart-total-amount');
-                const proceedPaymentBtn = document.getElementById('proceed-payment-btn');
-                const clearCartBtn = document.getElementById('clear-cart-btn');
-
                 if (cart.length === 0) {
-                    cartItems.innerHTML = '<div class="empty-cart"><p>Your cart is empty</p><p>Add cloud spaces from the configuration panel</p></div>';
-                    cartTotal.style.display = 'none';
+                    cartEmpty.style.display = 'block';
+                    cartFilled.style.display = 'none';
                     proceedPaymentBtn.style.display = 'none';
                     clearCartBtn.style.display = 'none';
                     return;
@@ -530,55 +505,75 @@
 
                 // Calculate total
                 const total = cart.reduce((sum, item) => sum + item.price, 0);
-                cartTotalAmount.textContent = total.toFixed(2);
-                cartTotal.style.display = 'block';
+                cartTotalPrice.textContent = `${total.toFixed(2)} MAD`;
+
+                // Show filled cart, hide empty message
+                cartEmpty.style.display = 'none';
+                cartFilled.style.display = 'block';
                 proceedPaymentBtn.style.display = 'block';
                 clearCartBtn.style.display = 'block';
 
                 // Clear cart items
-                cartItems.innerHTML = '';
+                cartItemsList.innerHTML = '';
 
-                // Add each item to cart
-                cart.forEach((item, index) => {
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <div class="cart-item-details">
-                            <div><strong>${item.projectName}</strong></div>
-                            <div>${item.size} - ${item.vcpus}vCPU, ${item.ram}GB RAM, ${item.storageDisplay}</div>
-                            <div>${item.price.toFixed(2)} MAD/month</div>
-                        </div>
-                        <div class="cart-item-actions">
-                            <button class="btn btn-danger remove-btn" data-index="${index}">Remove</button>
-                        </div>
-                    `;
-                    cartItems.appendChild(cartItem);
-                });
+                // Add the item to cart
+                const item = cart[0];
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-details">
+                        <div><strong>${item.size.toUpperCase()} Cloud Space</strong></div>
+                        <div>${item.vcpus}vCPU, ${item.ram}GB RAM, ${item.storageDisplay}</div>
+                        <div class="price">${item.price.toFixed(2)} MAD/month</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="btn btn-danger remove-btn">
+                            <svg width="16" height="16" fill="currentColor">
+                                <use xlink:href="#icon-close"></use>
+                            </svg>
+                            Remove
+                        </button>
+                    </div>
+                `;
+                cartItemsList.appendChild(cartItem);
 
-                // Add event listeners to remove buttons
-                document.querySelectorAll('.remove-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        cart.splice(index, 1);
-                        updateCart();
-                        showResult('Cloud space removed from cart', 'success');
+                // Add event listener to remove button
+                document.querySelector('.remove-btn').addEventListener('click', function() {
+                    cart = [];
+                    // Remove selection
+                    planCards.forEach(c => {
+                        c.classList.remove('selected');
+                        const badge = c.querySelector('.selected-badge');
+                        if (badge) badge.remove();
                     });
+                    selectedPlan = null;
+                    updateCart();
+                    updateSummary();
+                    showResult('Cloud space removed from cart', 'success');
                 });
             }
 
             // Clear cart functionality
-            document.getElementById('clear-cart-btn').addEventListener('click', function() {
+            clearCartBtn.addEventListener('click', function() {
                 if (cart.length === 0) return;
 
-                if (confirm('Are you sure you want to clear your cart?')) {
+                if (confirm('Are you sure you want to remove the cloud plan from your cart?')) {
                     cart = [];
+                    // Remove selection
+                    planCards.forEach(c => {
+                        c.classList.remove('selected');
+                        const badge = c.querySelector('.selected-badge');
+                        if (badge) badge.remove();
+                    });
+                    selectedPlan = null;
                     updateCart();
+                    updateSummary();
                     showResult('Cart cleared', 'success');
                 }
             });
 
             // Proceed to payment functionality
-            document.getElementById('proceed-payment-btn').addEventListener('click', function() {
+            proceedPaymentBtn.addEventListener('click', function() {
                 // Save cart to session storage
                 sessionStorage.setItem('cart', JSON.stringify(cart));
                 // Redirect to payment page
@@ -587,7 +582,6 @@
 
             // Show result message
             function showResult(message, type) {
-                const resultDiv = document.getElementById('result');
                 resultDiv.className = `result ${type}`;
                 resultDiv.innerHTML = `<p>${message}</p>`;
                 resultDiv.style.display = 'block';
@@ -599,5 +593,6 @@
             }
         });
     </script>
+
 </body>
 </html>

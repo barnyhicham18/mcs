@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment - Nutanix Cloud Space Provider</title>
+    <title>Payment - Morocco Cloud Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
+            --bg-light: #F8F9FA;
+            --bg-card: #FFFFFF;
+            --border-color: #DEE2E6;
+            --primary-accent: #6C5CE7;
+            --text-primary: #212529;
+            --text-secondary: #6C757D;
+            --gradient-start: #6C5CE7;
+            --gradient-end: #8A2BE2;
             --success: #4cc9f0;
-            --warning: #f72585;
             --danger: #dc3545;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
         }
 
         * {
@@ -23,42 +28,58 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fb;
-            color: var(--dark);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px;
-            width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 2rem;
         }
 
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
+        header.hero {
             text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            color: #FFFFFF;
+            background-image:
+                linear-gradient(to right, rgba(108, 92, 231, 0.9), rgba(138, 43, 226, 0.9)),
+                url('https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover;
+            background-position: center;
+        }
+
+        header.hero h1 {
+            font-size: 2.5rem;
+            color: #FFFFFF;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header.hero p {
+            font-size: 1rem;
+            color: #FFFFFF;
+            opacity: 0.9;
         }
 
         h1, h2, h3 {
-            margin-top: 0;
+            font-weight: 600;
         }
 
         .card {
-            background-color: white;
-            border-radius: 10px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         .form-group {
@@ -69,6 +90,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .prefilled-data {
@@ -78,6 +100,7 @@
             border: 1px solid #ddd;
             font-size: 1rem;
             margin-bottom: 0.5rem;
+            color: var(--text-secondary);
         }
 
         .payment-methods {
@@ -87,25 +110,31 @@
         }
 
         .payment-method {
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             padding: 1rem;
             text-align: center;
             flex: 1;
             cursor: pointer;
             transition: all 0.2s;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .payment-method.selected {
-            border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
+            border-color: var(--primary-accent);
+            background-color: rgba(108, 92, 231, 0.05);
         }
 
         .coupon-section {
             background-color: #f8f9fa;
             padding: 1.5rem;
-            border-radius: 10px;
+            border-radius: 8px;
             margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
         }
 
         .coupon-input {
@@ -117,44 +146,49 @@
         .coupon-input input {
             flex: 1;
             padding: 0.75rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
             font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
         }
 
         .btn {
-            background-color: var(--primary);
+            background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             display: inline-block;
             text-align: center;
             text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
         }
 
         .btn:hover {
-            background-color: var(--secondary);
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 92, 231, 0.2);
         }
 
         .btn-success {
-            background-color: var(--success);
-        }
-
-        .btn-success:hover {
-            background-color: #0a9396;
+            background-image: linear-gradient(to right, var(--success), #0a9396);
         }
 
         .btn-disabled {
-            background-color: var(--gray);
+            background-image: linear-gradient(to right, #cccccc, #999999);
             cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .btn-disabled:hover {
-            background-color: var(--gray);
+            background-image: linear-gradient(to right, #cccccc, #999999);
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
         }
 
         .error {
@@ -172,17 +206,19 @@
         }
 
         .summary {
-            background-color: var(--light);
+            background-color: var(--bg-light);
             padding: 1.5rem;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 2rem;
+            border: 1px solid var(--border-color);
         }
 
         .summary-item {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
         }
 
         .summary-item:last-child {
@@ -192,7 +228,7 @@
         .summary-total {
             font-weight: bold;
             font-size: 1.2rem;
-            color: var(--secondary);
+            color: var(--primary-accent);
         }
 
         .two-column-layout {
@@ -205,33 +241,35 @@
             text-align: center;
             margin-top: 3rem;
             padding: 1rem;
-            color: var(--gray);
+            color: var(--text-secondary);
             font-size: 0.9rem;
             width: 100%;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .two-column-layout {
                 grid-template-columns: 1fr;
             }
 
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
             .payment-methods {
                 flex-direction: column;
-            }
-
-            body {
-                padding: 10px;
             }
         }
 
         .order-details {
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .order-details h3 {
-            color: var(--primary);
+            color: var(--primary-accent);
             margin-bottom: 1rem;
         }
 
@@ -239,12 +277,13 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
         }
 
         .back-link {
             display: inline-block;
             margin-bottom: 1rem;
-            color: var(--primary);
+            color: var(--primary-accent);
             text-decoration: none;
             font-weight: 600;
         }
@@ -294,11 +333,14 @@
             text-align: center;
             margin: 1rem 0;
             padding: 1rem;
+            background-color: rgba(108, 92, 231, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--primary-accent);
         }
 
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary);
+            border-left-color: var(--primary-accent);
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -315,9 +357,9 @@
             text-align: center;
             margin: 1rem 0;
             padding: 1rem;
-            background-color: rgba(67, 97, 238, 0.1);
+            background-color: rgba(108, 92, 231, 0.1);
             border-radius: 8px;
-            border: 1px solid var(--primary);
+            border: 1px solid var(--primary-accent);
         }
 
         .payment-success {
@@ -345,30 +387,65 @@
             opacity: 0.8;
             cursor: default;
         }
-        
+
         .cloud-space-icon {
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .resource-details {
             background-color: #f8f9fa;
             padding: 1rem;
             border-radius: 8px;
             margin-top: 1rem;
+            border: 1px solid var(--border-color);
         }
-        
+
         .resource-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
         }
-        
+
         .resource-item:last-child {
             border-bottom: none;
             margin-bottom: 0;
+        }
+
+        .credentials-panel {
+            background-color: #e8f5e8;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+
+        .credential-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
         }
     </style>
 </head>
@@ -376,8 +453,8 @@
     <div class="container">
         <a href="/" class="back-link">← Back to Cloud Space Configuration</a>
 
-        <header>
-            <h1>Nutanix Cloud Space Provider</h1>
+        <header class="hero">
+            <h1>Morocco Cloud Space</h1>
             <p>Complete your purchase</p>
         </header>
 
@@ -397,10 +474,6 @@
                             <div class="cloud-space-icon">💳</div>
                             <div>Credit Card</div>
                         </div>
-                        <div class="payment-method">
-                            <div class="cloud-space-icon">📱</div>
-                            <div>PayPal</div>
-                        </div>
                     </div>
                 </div>
 
@@ -408,15 +481,15 @@
                     <h2>Personal Information</h2>
                     <div class="form-group">
                         <label>Full Name</label>
-                        <div class="prefilled-data">John Doe</div>
+                        <div class="prefilled-data">Full Name</div>
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
-                        <div class="prefilled-data">john.doe@example.com</div>
+                        <div class="prefilled-data">Email Address</div>
                     </div>
                     <div class="form-group">
                         <label>Billing Address</label>
-                        <div class="prefilled-data">123 Cloud Street, Casablanca, Morocco</div>
+                        <div class="prefilled-data">Billing Address</div>
                     </div>
                 </div>
 
@@ -424,15 +497,15 @@
                     <h2>Credit Card Information</h2>
                     <div class="form-group">
                         <label>Card Number</label>
-                        <div class="prefilled-data">**** **** **** 1234</div>
+                        <div class="prefilled-data">Card Number</div>
                     </div>
                     <div class="form-group">
                         <label>Expiration Date</label>
-                        <div class="prefilled-data">12/2025</div>
+                        <div class="prefilled-data">Expiration Date</div>
                     </div>
                     <div class="form-group">
                         <label>Security Code (CVV)</label>
-                        <div class="prefilled-data">***</div>
+                        <div class="prefilled-data">Security Code (CVV)</div>
                     </div>
                 </div>
             </div>
@@ -468,7 +541,7 @@
                     <button class="btn btn-disabled btn-block" id="complete-payment-btn" disabled>Complete Payment</button>
                     <div id="payment-completed-display" class="payment-completed-display" style="display: none;">Payment Completed</div>
                     <button class="btn btn-disabled btn-block" id="create-project-btn" disabled style="display: none; margin-top: 0.5rem;">Create Cloud Space</button>
-                    <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--gray);">
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
                         Apply a coupon code to complete payment
                     </p>
                 </div>
@@ -497,8 +570,7 @@
         </div>
 
         <footer>
-            <p>Powered by Nutanix & Node.js | © 2023 Cloud Space Provider</p>
-            <p>This is a mock payment page for demonstration purposes only. No actual payments are processed.</p>
+            <p> Demo Nutanix | Morocco Cloud Space </p>
         </footer>
     </div>
 
@@ -533,35 +605,32 @@
                 cart.forEach(item => {
                     total += item.price;
 
-                    const orderItem = document.createElement('div');
-                    orderItem.className = 'order-item';
-                    orderItem.innerHTML = `
-                        <div>
-                            <div><strong>${item.projectName}</strong></div>
-                            <div>${item.size.toUpperCase()} Cloud Space</div>
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="order-item">
+                            <div>
+                                <div><strong>${item.size.toUpperCase()} Cloud Space</strong></div>
+                                <div>${item.vcpus}vCPU, ${item.ram}GB RAM, ${item.storageDisplay}</div>
+                            </div>
+                            <div>${item.price.toFixed(2)} MAD</div>
                         </div>
-                        <div>${item.price.toFixed(2)} MAD</div>
-                    `;
-                    orderItemsContainer.appendChild(orderItem);
-                    
-                    // Add resource details
-                    const resourceDetails = document.createElement('div');
-                    resourceDetails.className = 'resource-details';
-                    resourceDetails.innerHTML = `
-                        <div class="resource-item">
-                            <span>vCPUs:</span>
-                            <span>${item.vcpus}</span>
-                        </div>
-                        <div class="resource-item">
-                            <span>RAM:</span>
-                            <span>${item.ram} GB</span>
-                        </div>
-                        <div class="resource-item">
-                            <span>Storage:</span>
-                            <span>${item.storageDisplay}</span>
+                        <div class="resource-details">
+                            <div class="resource-item">
+                                <span>vCPUs:</span>
+                                <span>${item.vcpus}</span>
+                            </div>
+                            <div class="resource-item">
+                                <span>RAM:</span>
+                                <span>${item.ram} GB</span>
+                            </div>
+                            <div class="resource-item">
+                                <span>Storage:</span>
+                                <span>${item.storageDisplay}</span>
+                            </div>
                         </div>
                     `;
-                    orderItemsContainer.appendChild(resourceDetails);
+                    orderItemsContainer.appendChild(cartItem);
                 });
 
                 subtotalAmount.textContent = `${total.toFixed(2)} MAD`;
@@ -686,7 +755,6 @@
                                         'Content-Type': 'application/json'
                                     },
                                     body: JSON.stringify({
-                                        projectName: item.projectName,
                                         description: item.description,
                                         size: item.size,
                                         storageBytes: item.storage
@@ -694,11 +762,7 @@
                                 });
 
                                 const result = await response.json();
-
-                                results.push({
-                                    success: result.success,
-                                    message: result.success ? 'Cloud space created successfully!' : result.error
-                                });
+                                results.push(result);
                             } catch (error) {
                                 results.push({
                                     success: false,
@@ -736,14 +800,41 @@
                             </div>
                         `;
 
+                        // After the deployment results are shown, display the user credentials
+                        if (results.length > 0 && results[0].success && results[0].userData) {
+                            const result = results[0];
+                            deploymentResult.innerHTML += `
+                                <div class="credentials-panel">
+                                    <h3>Your Cloud Space Details</h3>
+                                    <div class="credential-item">
+                                        <strong>Access URL:</strong> <a href="http://${result.projectUrl}" target="_blank">${result.projectUrl}</a>
+                                    </div>
+                                    <div class="credential-item">
+                                        <strong>Username:</strong> ${result.userData.upn}
+                                    </div>
+                                    <div class="credential-item">
+                                        <strong>Password:</strong> ${result.userData.password}
+                                    </div>
+                                    <div class="credential-item">
+                                        <strong>Configuration:</strong> ${result.configuration.vcpus} vCPUs, ${result.configuration.memory}GB RAM, ${result.configuration.storageDisplay} storage
+                                    </div>
+                                    <div class="credential-item" style="margin-top: 1rem;">
+                                        <strong>Note:</strong> Please save these credentials as they will not be shown again.
+                                    </div>
+                                </div>
+                            `;
+
+                            // Update button to show completion
+                            createProjectBtn.textContent = 'Cloud Space Created Successfully';
+                            createProjectBtn.style.backgroundColor = '#28a745';
+                            createProjectBtn.style.cursor = 'default';
+                        }
+
                         // Clear cart after successful creation
                         if (successCount > 0) {
                             cart = cart.filter((_, index) => !results[index].success);
                             sessionStorage.setItem('cart', JSON.stringify(cart));
                         }
-
-                        // Update button text to indicate completion
-                        createProjectBtn.textContent = 'Cloud Space Creation Completed';
 
                     } catch (error) {
                         deploymentResult.style.display = 'block';

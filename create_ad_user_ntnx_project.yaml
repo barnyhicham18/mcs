@@ -1,0 +1,143 @@
+---
+- name: Create Active Directory User
+  hosts: windows_dc
+  gather_facts: false
+  tasks:
+    - name: Load generated user data
+      include_vars:
+        file: user_data.json
+        name: user_data
+      register: loaded_user_data
+
+    - name: Display loaded user data
+      debug:
+        var: user_data
+
+    - name: Create AD user if doesn't exist
+      ansible.windows.win_powershell:
+        script: |
+          Import-Module ActiveDirectory
+          $existingUser = Get-ADUser -Filter {SamAccountName -eq "{{ user_data.name }}"} -ErrorAction SilentlyContinue
+
+          if ($existingUser) {
+              Write-Output "User {{ user_data.name }} already exists"
+              exit 0
+          }
+
+          $userParams = @{
+              Name                  = "{{ user_data.given_name }} {{ user_data.surname }}"
+              GivenName             = "{{ user_data.given_name }}"
+              Surname               = "{{ user_data.surname }}"
+              SamAccountName        = "{{ user_data.name }}"
+              UserPrincipalName     = "{{ user_data.upn }}"
+              AccountPassword       = (ConvertTo-SecureString "{{ user_data.password }}" -AsPlainText -Force)
+              Enabled               = $true
+              ChangePasswordAtLogon = $false
+              Path                  = "{{ user_data.ou_path }}"
+          }
+
+          try {
+              New-ADUser @userParams -ErrorAction Stop
+              Write-Output "User {{ user_data.name }} created successfully"
+              exit 0
+          } catch {
+              Write-Error "ERROR: $($_.Exception.Message)"
+              exit 1
+          }
+      register: create_result
+
+    - name: Display AD user creation result
+      debug:
+        var: create_result
+
+    - name: Check if user was created
+      set_fact:
+        user_created: "{{ 'created successfully' in create_result.output|join(' ') }}"
+
+    - name: Display user creation status
+      debug:
+        msg: "User {{ 'was' if user_created else 'was not' }} created"
+
+- name: Create Project with New User
+  hosts: localhost
+  gather_facts: false
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ nutanix_host }}"
+      nutanix_username: "{{ nutanix_username }}"
+      nutanix_password: "{{ nutanix_password }}"
+      validate_certs: false
+  tasks:
+    - name: Load user data
+      include_vars:
+        file: user_data.json
+        name: user_data
+
+    - name: Display user data
+      debug:
+        var: user_data
+
+    - name: Create project with generated user
+      nutanix.ncp.ntnx_projects:
+        name: "{{ project_name }}"
+        desc: "{{ project_description }}"
+        subnets:
+          - name: "{{ subnet_name }}"
+        default_subnet:
+          name: "{{ subnet_name }}"
+        accounts:
+          - name: "{{ account_name }}"
+        collaboration: true
+        role_mappings:
+          - user:
+              principal_name: "{{ user_data.upn }}"
+              directory_service_uuid: "{{ directory_service_uuid }}"
+            role:
+              name: "Project Admin"
+      register: project_creation
+
+    - name: Display project creation result
+      debug:
+        var: project_creation
+
+    - name: Wait for 30 seconds to allow project propagation
+      pause:
+        seconds: 30
+      delegate_to: localhost
+
+    - name: Set project quotas
+      shell: |
+        VCPUS={{ vcpus_limit | int }} STORAGE={{ (storage_limit | int / 1000000000) | int }} MEMORY={{ memory_limit | int }} /usr/bin/calm update project "{{ project_name }}" -ao -f projectquota.py
+      register: quota_result
+      delegate_to: localhost
+      become: true
+
+    - name: Display quota setting result
+      debug:
+        var: quota_result
+
+    - name: Wait for 30 seconds to allow quota propagation
+      pause:
+        seconds: 30
+      delegate_to: localhost
+
+    - name: Create environment
+      shell: |
+        /usr/bin/calm update cache
+        NTNX_ACCOUNT_NAME="{{ account_name }}" NTNX_SUBNET="{{ subnet_name }}" NTNX_SUBNET_CLUSTER="PHX-POC301" /usr/bin/calm create environment -f enviro.py -p "{{ project_name }}" -n "{{ user_data.name }} env"
+      register: env_result
+      delegate_to: localhost
+      become: true
+
+    - name: Display environment creation result
+      debug:
+        var: env_result
+
+    - name: Show final status and project URL
+      debug:
+        msg: |
+          Project and environment creation completed for user {{ user_data.name }}
+          Project Name: {{ project_name }}
+          Project URL: console.demonutanix.africa
+          User: {{ user_data.upn }}
+          Configuration: {{ vcpus_limit }} vCPUs, {{ memory_limit }}GB RAM, {{ storage_limit }} bytes storage
