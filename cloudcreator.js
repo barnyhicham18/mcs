@@ -1,6 +1,7 @@
 // Add this at the very top
 require('dotenv').config();
 const winston = require('winston');
+const mysql = require('mysql2/promise');
 
 // Configure Winston logger
 const logger = winston.createLogger({
@@ -10,7 +11,7 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: 'cloudspace.log' })
+    new winston.transports.File({ filename: 'file.log' })
   ]
 });
 
@@ -20,6 +21,42 @@ if (process.env.NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
+
+// Database connection pool
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'cloudspace_database'
+};
+
+let pool;
+
+async function initializeDatabase() {
+  try {
+    pool = mysql.createPool(dbConfig);
+    
+    // Create table if it doesn't exist
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS cloudspace_instances (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        configuration TEXT NOT NULL,
+        access_url VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    
+    await pool.execute(createTableQuery);
+    logger.info('Database initialized successfully');
+  } catch (error) {
+    logger.error('Database initialization failed:', error);
+  }
+}
+
+// Initialize database when app starts
+initializeDatabase();
 
 const express = require('express');
 const { spawn, execSync } = require('child_process');
@@ -170,6 +207,25 @@ function extractProjectInfo(output) {
   return info;
 }
 
+// Function to store data in MySQL
+async function storeInDatabase(username, password, configuration, accessUrl) {
+  try {
+    const connection = await pool.getConnection();
+    const query = `
+      INSERT INTO cloudspace_instances 
+      (username, password, configuration, access_url) 
+      VALUES (?, ?, ?, ?)
+    `;
+    await connection.execute(query, [username, password, configuration, accessUrl]);
+    connection.release();
+    logger.info('Data stored in database successfully');
+    return true;
+  } catch (error) {
+    logger.error('Error storing data in database:', error);
+    return false;
+  }
+}
+
 // API endpoint to create project
 app.post('/api/project/create', async (req, res) => {
   try {
@@ -221,12 +277,26 @@ app.post('/api/project/create', async (req, res) => {
     );
 
     if (result.success) {
+      // Store data in MySQL database
+      const configuration = `${planConfig.vcpus} vCPUs, ${planConfig.memory_gb}GB RAM, ${result.configuration.storageDisplay} storage`;
+      const dbSuccess = await storeInDatabase(
+        userData.upn,
+        userData.password,
+        configuration,
+        result.projectUrl
+      );
+
+      if (!dbSuccess) {
+        logger.warn('Project created but failed to store in database');
+      }
+
       res.json({
         success: true,
         message: 'Project created successfully',
         userData: result.userData,
         projectUrl: result.projectUrl,
-        configuration: result.configuration
+        configuration: result.configuration,
+        dbSuccess: dbSuccess
       });
     } else {
       res.status(500).json({
@@ -260,6 +330,15 @@ app.get('/', (req, res) => {
 // Serve the payment page
 app.get('/payment', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'payment.html'));
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  logger.info('Shutting down gracefully');
+  if (pool) {
+    await pool.end();
+  }
+  process.exit(0);
 });
 
 // Start the server
