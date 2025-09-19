@@ -1,0 +1,2 @@
+{"level":"error","message":"Ansible error: [WARNING]: Collection ansible.windows does not support Ansible version 2.14.18\n","timestamp":"2025-09-19T15:07:04.505Z"}
+{"level":"error","message":"Ansible error: [WARNING]: Collection nutanix.ncp does not support Ansible version 2.14.18\n","timestamp":"2025-09-19T15:07:04.507Z"}

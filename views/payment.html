@@ -17,7 +17,7 @@
             --text-secondary: #6C757D;
             --gradient-start: #6C5CE7;
             --gradient-end: #8A2BE2;
-            --success: #4cc9f0;
+            --success: #4CAF50; /* Changed to green */
             --danger: #dc3545;
         }
 
@@ -175,7 +175,7 @@
         }
 
         .btn-success {
-            background-image: linear-gradient(to right, var(--success), #0a9396);
+            background-image: linear-gradient(to right, var(--success), #2E7D32); /* Darker green for gradient */
         }
 
         .btn-disabled {
@@ -301,9 +301,9 @@
         }
 
         .deployment-success {
-            background-color: rgba(76, 201, 240, 0.1);
+            background-color: rgba(76, 175, 80, 0.1); /* Updated to green */
             border: 1px solid var(--success);
-            color: #0a58ca;
+            color: #1B5E20; /* Darker green text */
         }
 
         .deployment-error {
@@ -319,8 +319,8 @@
         }
 
         .deployment-item-success {
-            border-left-color: green;
-            background-color: rgba(0, 255, 0, 0.1);
+            border-left-color: var(--success); /* Updated to green */
+            background-color: rgba(76, 175, 80, 0.1); /* Updated to green */
         }
 
         .deployment-item-error {
@@ -367,10 +367,10 @@
             text-align: center;
             margin: 1rem 0;
             padding: 1rem;
-            background-color: rgba(76, 201, 240, 0.1);
+            background-color: rgba(76, 175, 80, 0.1); /* Updated to green */
             border-radius: 8px;
             border: 1px solid var(--success);
-            color: #0a58ca;
+            color: #1B5E20; /* Darker green text */
         }
 
         .payment-completed-display {
@@ -446,6 +446,52 @@
         .btn-block {
             display: block;
             width: 100%;
+        }
+
+        /* New styles for the automatic creation process */
+        .creation-process {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .process-step.active {
+            color: var(--success); /* Changed to green */
+            font-weight: 500;
+        }
+
+        .process-step.completed {
+            color: var(--success); /* Changed to green */
+        }
+
+        .process-step-icon {
+            margin-right: 0.75rem;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .process-step.active .process-step-icon {
+            background-color: var(--success); /* Changed to green */
+            color: white;
+        }
+
+        .process-step.completed .process-step-icon {
+            background-color: var(--success); /* Changed to green */
+            color: white;
         }
     </style>
 </head>
@@ -540,7 +586,6 @@
                 <div class="summary">
                     <button class="btn btn-disabled btn-block" id="complete-payment-btn" disabled>Complete Payment</button>
                     <div id="payment-completed-display" class="payment-completed-display" style="display: none;">Payment Completed</div>
-                    <button class="btn btn-disabled btn-block" id="create-project-btn" disabled style="display: none; margin-top: 0.5rem;">Create Cloud Space</button>
                     <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
                         Apply a coupon code to complete payment
                     </p>
@@ -555,7 +600,28 @@
                 <!-- Payment success message -->
                 <div class="payment-success" id="payment-success">
                     <p>✅ Payment processed successfully!</p>
-                    <p>You can now create your cloud space</p>
+                    <p>Your cloud space is being created...</p>
+                </div>
+
+                <!-- Creation process steps -->
+                <div class="creation-process" id="creation-process" style="display: none;">
+                    <h3>Creation Progress</h3>
+                    <div class="process-step" id="step-payment">
+                        <span class="process-step-icon">1</span>
+                        <span>Payment Processing</span>
+                    </div>
+                    <div class="process-step" id="step-provisioning">
+                        <span class="process-step-icon">2</span>
+                        <span>Provisioning Resources</span>
+                    </div>
+                    <div class="process-step" id="step-configuration">
+                        <span class="process-step-icon">3</span>
+                        <span>Configuration</span>
+                    </div>
+                    <div class="process-step" id="step-completion">
+                        <span class="process-step-icon">4</span>
+                        <span>Finalizing Setup</span>
+                    </div>
                 </div>
 
                 <!-- Deployment result container -->
@@ -585,12 +651,12 @@
             const subtotalAmount = document.getElementById('subtotal-amount');
             const completePaymentBtn = document.getElementById('complete-payment-btn');
             const paymentCompletedDisplay = document.getElementById('payment-completed-display');
-            const createProjectBtn = document.getElementById('create-project-btn');
             const orderItemsContainer = document.getElementById('order-items');
             const deploymentResult = document.getElementById('deployment-result');
             const loadingIndicator = document.getElementById('loading');
             const paymentProcessing = document.getElementById('payment-processing');
             const paymentSuccess = document.getElementById('payment-success');
+            const creationProcess = document.getElementById('creation-process');
 
             // Valid coupon code
             const validCoupon = 'FREENTNX2026';
@@ -703,6 +769,10 @@
                     this.disabled = true;
                     this.textContent = 'Processing...';
 
+                    // Show creation process
+                    creationProcess.style.display = 'block';
+                    document.getElementById('step-payment').classList.add('active');
+
                     // Simulate payment processing delay
                     setTimeout(() => {
                         // Hide processing indicator
@@ -710,12 +780,6 @@
 
                         // Show success message
                         paymentSuccess.style.display = 'block';
-
-                        // Enable project creation button
-                        createProjectBtn.style.display = 'block';
-                        createProjectBtn.disabled = false;
-                        createProjectBtn.classList.remove('btn-disabled');
-                        createProjectBtn.classList.add('btn-success');
 
                         // Update payment status
                         paymentCompleted = true;
@@ -725,135 +789,147 @@
                         paymentCompletedDisplay.style.display = 'block';
 
                         // Update instruction text
-                        document.querySelector('.summary p').textContent = 'You can now create your cloud space';
+                        document.querySelector('.summary p').textContent = 'Your cloud space is being created';
+
+                        // Mark payment step as completed
+                        document.getElementById('step-payment').classList.remove('active');
+                        document.getElementById('step-payment').classList.add('completed');
+                        document.getElementById('step-provisioning').classList.add('active');
+
+                        // Start the project creation process automatically
+                        createCloudSpace();
                     }, 2000);
                 }
             });
 
-            // Create Project functionality
-            createProjectBtn.addEventListener('click', async function() {
-                if (!this.disabled) {
-                    // Disable the button immediately to prevent multiple clicks
-                    this.disabled = true;
-                    this.classList.add('btn-disabled');
-                    this.classList.remove('btn-success');
-                    this.textContent = 'Processing...';
+            // Function to update process steps
+            function updateProcessStep(stepId, isCompleted) {
+                const step = document.getElementById(stepId);
+                if (isCompleted) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                } else {
+                    step.classList.add('active');
+                }
+            }
 
-                    // Show loading indicator
-                    loadingIndicator.style.display = 'block';
-                    deploymentResult.style.display = 'none';
+            // Create Cloud Space functionality (automatically triggered after payment)
+            async function createCloudSpace() {
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                deploymentResult.style.display = 'none';
 
-                    try {
-                        // Create each cloud space in the cart
-                        const results = [];
+                try {
+                    // Create each cloud space in the cart
+                    const results = [];
 
-                        for (const item of cart) {
-                            try {
-                                const response = await fetch('/api/project/create', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        description: item.description,
-                                        size: item.size,
-                                        storageBytes: item.storage
-                                    })
-                                });
+                    for (const item of cart) {
+                        try {
+                            // Update provisioning step
+                            updateProcessStep('step-provisioning', false);
+                            updateProcessStep('step-configuration', true);
 
-                                const result = await response.json();
-                                results.push(result);
-                            } catch (error) {
-                                results.push({
-                                    success: false,
-                                    error: error.message || 'Failed to create cloud space'
-                                });
-                            }
+                            const response = await fetch('/api/project/create', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    description: item.description,
+                                    size: item.size,
+                                    storageBytes: item.storage
+                                })
+                            });
+
+                            const result = await response.json();
+                            results.push(result);
+
+                            // Update configuration step as completed
+                            updateProcessStep('step-configuration', true);
+                            updateProcessStep('step-completion', true);
+
+                        } catch (error) {
+                            results.push({
+                                success: false,
+                                error: error.message || 'Failed to create cloud space'
+                            });
                         }
+                    }
 
-                        // Show deployment results
-                        deploymentResult.style.display = 'block';
+                    // Show deployment results
+                    deploymentResult.style.display = 'block';
 
-                        let successCount = results.filter(r => r.success).length;
-                        let errorCount = results.filter(r => !r.success).length;
+                    let successCount = results.filter(r => r.success).length;
+                    let errorCount = results.filter(r => !r.success).length;
 
-                        if (successCount > 0 && errorCount === 0) {
-                            deploymentResult.className = 'deployment-result deployment-success';
-                        } else if (errorCount > 0 && successCount === 0) {
-                            deploymentResult.className = 'deployment-result deployment-error';
-                        } else {
-                            // Mixed results
-                            deploymentResult.style.borderLeft = '4px solid #ffc107';
-                            deploymentResult.style.backgroundColor = '#fff3cd';
-                            deploymentResult.style.color = '#856404';
-                        }
+                    if (successCount > 0 && errorCount === 0) {
+                        deploymentResult.className = 'deployment-result deployment-success';
+                    } else if (errorCount > 0 && successCount === 0) {
+                        deploymentResult.className = 'deployment-result deployment-error';
+                    } else {
+                        // Mixed results
+                        deploymentResult.style.borderLeft = '4px solid #ffc107';
+                        deploymentResult.style.backgroundColor = '#fff3cd';
+                        deploymentResult.style.color = '#856404';
+                    }
 
-                        deploymentResult.innerHTML = `
-                            <h3>Creation Complete</h3>
-                            <p><strong>${successCount}</strong> cloud spaces created successfully, <strong>${errorCount}</strong> failed</p>
-                            <div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;">
-                                ${results.map((result, index) => `
-                                    <div class="deployment-item ${result.success ? 'deployment-item-success' : 'deployment-item-error'}">
-                                        <strong>Cloud Space ${index + 1}:</strong> ${result.success ? result.message : result.error}
-                                    </div>
-                                `).join('')}
+                    deploymentResult.innerHTML = `
+                        <h3>Creation Complete</h3>
+                        <p><strong>${successCount}</strong> cloud spaces created successfully, <strong>${errorCount}</strong> failed</p>
+                        <div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;">
+                            ${results.map((result, index) => `
+                                <div class="deployment-item ${result.success ? 'deployment-item-success' : 'deployment-item-error'}">
+                                    <strong>Cloud Space ${index + 1}:</strong> ${result.success ? result.message : result.error}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    // After the deployment results are shown, display the user credentials
+                    if (results.length > 0 && results[0].success && results[0].userData) {
+                        const result = results[0];
+                        deploymentResult.innerHTML += `
+                            <div class="credentials-panel">
+                                <h3>Your Cloud Space Details</h3>
+                                <div class="credential-item">
+                                    <strong>Access URL:</strong> <a href="http://${result.projectUrl}" target="_blank">${result.projectUrl}</a>
+                                </div>
+                                <div class="credential-item">
+                                    <strong>Username:</strong> ${result.userData.upn}
+                                </div>
+                                <div class="credential-item">
+                                    <strong>Password:</strong> ${result.userData.password}
+                                </div>
+                                <div class="credential-item">
+                                    <strong>Configuration:</strong> ${result.configuration.vcpus} vCPUs, ${result.configuration.memory}GB RAM, ${result.configuration.storageDisplay} storage
+                                </div>
+                                <div class="credential-item" style="margin-top: 1rem;">
+                                    <strong>Note:</strong> Please save these credentials as they will not be shown again.
+                                </div>
                             </div>
                         `;
 
-                        // After the deployment results are shown, display the user credentials
-                        if (results.length > 0 && results[0].success && results[0].userData) {
-                            const result = results[0];
-                            deploymentResult.innerHTML += `
-                                <div class="credentials-panel">
-                                    <h3>Your Cloud Space Details</h3>
-                                    <div class="credential-item">
-                                        <strong>Access URL:</strong> <a href="http://${result.projectUrl}" target="_blank">${result.projectUrl}</a>
-                                    </div>
-                                    <div class="credential-item">
-                                        <strong>Username:</strong> ${result.userData.upn}
-                                    </div>
-                                    <div class="credential-item">
-                                        <strong>Password:</strong> ${result.userData.password}
-                                    </div>
-                                    <div class="credential-item">
-                                        <strong>Configuration:</strong> ${result.configuration.vcpus} vCPUs, ${result.configuration.memory}GB RAM, ${result.configuration.storageDisplay} storage
-                                    </div>
-                                    <div class="credential-item" style="margin-top: 1rem;">
-                                        <strong>Note:</strong> Please save these credentials as they will not be shown again.
-                                    </div>
-                                </div>
-                            `;
-
-                            // Update button to show completion
-                            createProjectBtn.textContent = 'Cloud Space Created Successfully';
-                            createProjectBtn.style.backgroundColor = '#28a745';
-                            createProjectBtn.style.cursor = 'default';
-                        }
-
-                        // Clear cart after successful creation
-                        if (successCount > 0) {
-                            cart = cart.filter((_, index) => !results[index].success);
-                            sessionStorage.setItem('cart', JSON.stringify(cart));
-                        }
-
-                    } catch (error) {
-                        deploymentResult.style.display = 'block';
-                        deploymentResult.className = 'deployment-result deployment-error';
-                        deploymentResult.innerHTML = `
-                            <h3>Creation Error</h3>
-                            <p>${error.message || 'Unknown error occurred during creation'}</p>
-                        `;
-
-                        // Reset button if there was an error
-                        createProjectBtn.disabled = false;
-                        createProjectBtn.classList.remove('btn-disabled');
-                        createProjectBtn.classList.add('btn-success');
-                        createProjectBtn.textContent = 'Create Cloud Space';
-                    } finally {
-                        loadingIndicator.style.display = 'none';
+                        // Mark final step as completed
+                        updateProcessStep('step-completion', true);
                     }
+
+                    // Clear cart after successful creation
+                    if (successCount > 0) {
+                        cart = cart.filter((_, index) => !results[index].success);
+                        sessionStorage.setItem('cart', JSON.stringify(cart));
+                    }
+
+                } catch (error) {
+                    deploymentResult.style.display = 'block';
+                    deploymentResult.className = 'deployment-result deployment-error';
+                    deploymentResult.innerHTML = `
+                        <h3>Creation Error</h3>
+                        <p>${error.message || 'Unknown error occurred during creation'}</p>
+                    `;
+                } finally {
+                    loadingIndicator.style.display = 'none';
                 }
-            });
+            }
         });
     </script>
 </body>

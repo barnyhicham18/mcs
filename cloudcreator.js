@@ -1,5 +1,25 @@
 // Add this at the very top
 require('dotenv').config();
+const winston = require('winston');
+
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'file.log' })
+  ]
+});
+
+// Add console transport for development
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
 
 const express = require('express');
 const { spawn, execSync } = require('child_process');
@@ -60,7 +80,7 @@ function generateUserData() {
       throw new Error('User data file not found after generation');
     }
   } catch (error) {
-    console.error('Error generating user data:', error);
+    logger.error('Error generating user data:', error);
     throw error;
   }
 }
@@ -101,12 +121,12 @@ function createProjectWithUser(vcpusLimit, memoryLimitGb, storageLimitBytes, use
 
     ansibleProcess.stdout.on('data', (data) => {
       output += data.toString();
-      console.log(data.toString());
+      logger.info(data.toString());
     });
 
     ansibleProcess.stderr.on('data', (data) => {
       errorOutput = data.toString();
-      console.error(data.toString());
+      logger.error(data.toString());
     });
 
     ansibleProcess.on('close', (code) => {
@@ -183,7 +203,7 @@ app.post('/api/project/create', async (req, res) => {
     let userData;
     try {
       userData = await generateUserData();
-      console.log('Generated user data:', userData);
+      logger.info('Generated user data:', userData);
     } catch (error) {
       return res.status(500).json({
         success: false,
@@ -216,7 +236,7 @@ app.post('/api/project/create', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error creating project:', error);
+    logger.error('Error creating project:', error);
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to create project'
@@ -245,9 +265,9 @@ app.get('/payment', (req, res) => {
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Morocco Cloud Space app listening on port ${PORT}`);
-  console.log('Available plans:');
+  logger.info(`Morocco Cloud Space app listening on port ${PORT}`);
+  logger.info('Available plans:');
   Object.keys(cloudSpacePlans).forEach(plan => {
-    console.log(`- ${plan}: ${cloudSpacePlans[plan].vcpus} vCPUs, ${cloudSpacePlans[plan].memory_gb}GB RAM, ${cloudSpacePlans[plan].price} MAD`);
+    logger.info(`- ${plan}: ${cloudSpacePlans[plan].vcpus} vCPUs, ${cloudSpacePlans[plan].memory_gb}GB RAM, ${cloudSpacePlans[plan].price} MAD`);
   });
 });
