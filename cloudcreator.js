@@ -77,6 +77,7 @@ const config = {
   nutanixUser: process.env.NUTANIX_USER,
   nutanixPassword: process.env.NUTANIX_PASSWORD,
   subnetName: process.env.SUBNET_NAME || "NTNX-IPAM",
+  clusterName: process.env.CLUSTER_NAME,
   accountName: process.env.ACCOUNT_NAME || "NTNX_LOCAL_AZ",
   directoryServiceUuid: process.env.DIRECTORY_SERVICE_UUID
 };
@@ -139,6 +140,7 @@ function createProjectWithUser(vcpusLimit, memoryLimitGb, storageLimitBytes, use
       memory_limit: parseInt(memoryLimitGb),
       storage_limit: parseInt(storageLimitBytes),
       subnet_name: config.subnetName,
+      cluster_name: config.clusterName,      
       account_name: config.accountName,
       directory_service_uuid: config.directoryServiceUuid
     };

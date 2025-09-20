@@ -100,38 +100,53 @@
       debug:
         var: project_creation
 
-    - name: Wait for 30 seconds to allow project propagation
+    - name: Wait for 20 seconds to allow project propagation
       pause:
-        seconds: 30
+        seconds: 20
       delegate_to: localhost
 
     - name: Set project quotas
       shell: |
-        VCPUS={{ vcpus_limit | int }} STORAGE={{ (storage_limit | int / 1000000000) | int }} MEMORY={{ memory_limit | int }} /usr/bin/calm update project "{{ project_name }}" -ao -f projectquota.py
+        VCPUS={{ vcpus_limit | int }} STORAGE={{ (storage_limit | int / 1000000000) | int }} MEMORY={{ memory_limit | int }} /usr/local/bin/calm update project "{{ project_name }}" -ao -f projectquota.py
       register: quota_result
       delegate_to: localhost
       become: true
 
-    - name: Display quota setting result
+    - name: Display quota setting result 1
       debug:
-        var: quota_result
+        var: quota_result.stderr_lines
 
-    - name: Wait for 30 seconds to allow quota propagation
+    - name: Display quota setting result 2
+      debug:
+        var: quota_result.stdout_lines
+
+    - name: Wait for 10 seconds to allow quota propagation
       pause:
-        seconds: 30
+        seconds: 10
       delegate_to: localhost
+
+
+    - name: update cache
+      shell: |
+        /usr/local/bin/calm update cache
+      delegate_to: localhost
+      become: true
+
 
     - name: Create environment
       shell: |
-        /usr/bin/calm update cache
-        NTNX_ACCOUNT_NAME="{{ account_name }}" NTNX_SUBNET="{{ subnet_name }}" NTNX_SUBNET_CLUSTER="PHX-POC301" /usr/bin/calm create environment -f enviro.py -p "{{ project_name }}" -n "{{ user_data.name }} env"
+        NTNX_ACCOUNT_NAME="{{ account_name }}" NTNX_SUBNET="{{ subnet_name }}" NTNX_SUBNET_CLUSTER="{{ cluster_name }}" /usr/local/bin/calm create environment -f enviro.py -p "{{ project_name }}" -n "{{ user_data.name }} env"
       register: env_result
       delegate_to: localhost
       become: true
 
-    - name: Display environment creation result
+    - name: Display environment creation result 1
       debug:
-        var: env_result
+        var: env_result.stderr_lines
+
+    - name: Display environment creation result 2
+      debug:
+        var: env_result.stdout_lines
 
     - name: Show final status and project URL
       debug:
