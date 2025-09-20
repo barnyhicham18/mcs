@@ -1,3 +1,108 @@
+## Prerequisites
+
+- **Nutanix Cluster** with admin credentials
+- **Rocky Linux** disk image (tested [Rocky-9-GenericCloud-Base.latest.x86_64.qcow2](https://dl.rockylinux.org/pub/rocky/9.6/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2))
+- **Network** with IPAM-enabled [subnet](https://portal.nutanix.com/page/documents/details?targetId=Prism-Central-Guide-vpc_2024_3_1:mul-network-configuration-view-pc-t.html)  
+## Quick Installation
+
+
+1. **Provision CMP VM**
+   - Deploy Rocky Linux 9.6 [VM on Nutanix](https://portal.nutanix.com/page/documents/details?targetId=Prism-Central-Guide-vpc_7_3:mul-vm-create-acropolis-pc-t.html) 
+
+
+2. **Install Dependencies**
+
+- update system
+```
+dnf update -y
+```
+- install the essential tools
+```
+dnf install vim bash-completion git -y
+```
+
+- install nodejs and mysql
+```
+dnf install npm mysql-server -y
+```
+- install ansible and its required modules
+```
+dnf install ansible-core -y
+ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install nutanix.ncp
+ansible-galaxy collection install ansible.windows
+pip3 install "pywinrm>=0.4.0" #for connection to the Active Directory
+```
+
+- clone this repo:
+
+```
+git clone https://github.com/elyacoub9/cloudspace.git
+cd cloudspace
+```
+
+- create .env file 
+
+```
+cp  env_simple .env #update the vars with the correct values
+```
+- for the DIRECTORY_SERVICE_UUID variable, run the following command
+
+```
+response=$(curl --request POST --url https://10.38.73.39:9440/api/nutanix/v3/directory_services/list \--header 'Accept: application/json' --header 'Content-Type: application/json' \
+-u "$NUTANIX_USER:$NUTANIX_PASSWORD" \
+--data '{ "kind": "directory_service"}' \
+--insecure 
+)
+
+echo $response | jq -r '.entities[0].spec.name'
+echo $response | jq -r '.entities[0].metadata.uuid'
+```
+
+- create inventory.ini file
+```
+cp  inventory.ini_sample inventory.ini #update the vars with the correct values (active directory ip, username, and password)
+```
+
+
+
+
+### configure calm-dsl
+
+```
+git clone https://github.com/nutanix/calm-dsl.git
+cd calm-dsl
+```
+
+```
+sudo dnf install -y python3 python3-devel openssl-devel make gcc openssl python3-pip
+sudo pip3 install --upgrade pip setuptools wheel
+sudo pip3 install --ignore-installed -r requirements.txt
+sudo pip3 install -e .
+```
+run `whereis calm` and you should have soomething like `calm: /usr/local/bin/calm` in  the output
+
+then run
+
+```
+calm init dsl --ip $NUTANIX_HOST --port 9440 --username $NUTANIX_USER --password $NUTANIX_PASSWORD
+```
+
+
+## database configuration
+
+```
+systemctl enable --now mysqld
+```
+```
+mysql_secure_installation
+```
+```
+mysql -u root -p -e "CREATE DATABASE cloudspace_database;"
+```
+
+---
 # Prerequisites
 
 - **Nutanix Cluster** with admin credentials
@@ -14,12 +119,30 @@
 ```bash
 dnf update -y
 dnf install vim bash-completion git npm mysql-server ansible-core -y
+``` 
+
+- tested versions:
 ```
+git version 2.47.3
+npm version 8.19.4
+mysqld  version 8.0.41
+ansible core version 2.14.18
+```
+
+
 
 ## 3. Setup Ansible
 ```bash
 ansible-galaxy collection install community.general ansible.posix nutanix.ncp ansible.windows
 pip3 install "pywinrm>=0.4.0"
+```
+
+-  tested version:
+```
+ansible.posix     2.1.0
+ansible.windows   3.2.0
+community.general 11.3.0
+nutanix.ncp       2.2.0
 ```
 
 ## 4. Clone Repository
