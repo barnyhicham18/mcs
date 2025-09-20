@@ -11,7 +11,7 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: 'file.log' })
+    new winston.transports.File({ filename: 'cloudspace.log' })
   ]
 });
 
