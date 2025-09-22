@@ -31,6 +31,7 @@ ansible core version 2.14.18
 ```bash
 ansible-galaxy collection install community.general ansible.posix nutanix.ncp ansible.windows
 pip3 install "pywinrm>=0.4.0"
+pip3 install ntnx-iam-py-client
 ```
 
 -  tested version:
