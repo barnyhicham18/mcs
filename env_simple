@@ -13,4 +13,5 @@ DB_PASSWORD=password
 DB_NAME=cloudspace_database
 
 #directory_service
+DIRECTORY_SERVICE_UUID=9f37ce21-77bb-5191-b8a3-0540189af773
 
