@@ -44,8 +44,8 @@ nutanix.ncp       2.2.0
 
 ## 4. Clone Repository
 ```bash
-git clone https://github.com/elyacoub9/cloudspace.git
-cd cloudspace
+git clone https://github.com/barnyhicham18/mcs.git
+cd mcs
 cp env_simple .env
 cp inventory.ini_sample inventory.ini
 ```
