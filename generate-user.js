@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 function generateRandomUser() {
-  const domains = ['ntnx.local'];
+  const domains = ['ntnxlab.local'];
   const firstNames = [
   'Swift', 'Silent', 'Clever', 'Lunar', 'Solar', 'Electric', 'Mystic', 'Crimson', 'Azure', 'Noble',
   'Wandering', 'Epic', 'Phantom', 'Iron', 'Golden', 'Ancient', 'Hidden', 'Jolly', 'Quiet', 'Velvet',
@@ -41,7 +41,7 @@ function generateRandomUser() {
     surname: lastName,
     password: password,
     upn: `${username}@${domain}`,
-    ou_path: 'CN=CloudSpace1,DC=ntnx,DC=local'
+    ou_path: 'OU=cloudspace,DC=ntnxlab,DC=local'
   };
 }
 

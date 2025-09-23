@@ -156,3 +156,14 @@
           Project URL: console.demonutanix.africa
           User: {{ user_data.upn }}
           Configuration: {{ vcpus_limit }} vCPUs, {{ memory_limit }}GB RAM, {{ storage_limit }} bytes storage
+
+    - name: Save project UUID to JSON file
+      copy:
+        content: |
+          {
+            "project_name": "{{ project_name }}",
+            "project_uuid": "{{ project_creation.project_uuid }}",
+            "user_name": "{{ user_data.upn }}",
+            "user_uuid": "{{ project_creation.response.status.project_status.resources.user_reference_list[0].uuid }}"
+          }
+        dest: project_data.json
