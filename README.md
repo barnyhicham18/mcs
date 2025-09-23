@@ -57,6 +57,7 @@ git clone https://github.com/nutanix/calm-dsl.git
 cd calm-dsl
 sudo dnf install -y python3 python3-devel openssl-devel make gcc openssl python3-pip
 sudo pip3 install --upgrade pip setuptools wheel
+pip3 install "setuptools<65" --force-reinstall
 sudo pip3 install --ignore-installed -r requirements.txt
 sudo pip3 install -e .
 
